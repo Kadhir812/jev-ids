@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>JEV-IDS | Research presentation</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #f0eee5;
+      --paper: #fcfaf4;
+      --ink: #20342b;
+      --muted: #5b6b5e;
+      --line: #d9ddcf;
+      --soft: #f4f3eb;
+      --accent: #286246;
+      --accent-soft: #e7f0e7;
+      --gold: #896329;
+      --gold-soft: #f4ecd9;
+      --green: #286246;
+      --green-soft: #e8f1e8;
+      --navy: #19362b;
+      --navy-muted: #c6d2c3;
+      --comparison: #788579;
+      --shadow: #263a2a14;
+      font-family: Inter, ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --page: #263429;
+      --paper: #344435;
+      --ink: #f2ead4;
+      --muted: #d0c8af;
+      --line: #596750;
+      --soft: #40513e;
+      --accent: #b2d29a;
+      --accent-soft: #455a40;
+      --gold: #eed08f;
+      --gold-soft: #594d34;
+      --green: #b3d6a5;
+      --green-soft: #435843;
+      --navy: #202d23;
+      --navy-muted: #d8cfb5;
+      --comparison: #b2baa6;
+      --shadow: #00000038;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--page);
+      color: var(--ink);
+      font-size: 16px;
+      line-height: 1.45;
+    }
+    button { font: inherit; }
+    #deck { max-width: 1240px; margin: 0 auto; padding: 18px; }
+    .slide {
+      display: none;
+      position: relative;
+      min-height: min(69.75vw, 690px);
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      flex-direction: column;
+      gap: 14px;
+      padding: clamp(25px, 4vw, 50px) clamp(28px, 5vw, 62px) 54px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 96% 3%, color-mix(in srgb, var(--accent) 7%, transparent) 0 165px, transparent 166px),
+        var(--paper);
+      box-shadow: 0 16px 38px var(--shadow);
+    }
+    .slide:not(.cover)::before {
+      position: absolute;
+      inset: 0 0 auto;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), color-mix(in srgb, var(--accent) 35%, var(--paper)) 72%, transparent);
+      content: "";
+    }
+    .slide.active { display: flex; animation: enter .2s ease-out; }
+    @keyframes enter { from { opacity: .4; transform: translateX(8px); } to { opacity: 1; transform: none; } }
+    .slide.cover {
+      justify-content: center;
+      padding: clamp(35px, 7vw, 86px);
+      background:
+        radial-gradient(circle at 88% 18%, #285b43 0, transparent 34%),
+        linear-gradient(125deg, #10261d, #183b2d 70%, #214735);
+      border-color: #2d4837;
+      color: #f7f8ef;
+    }
+    .slide.cover::after {
+      position: absolute;
+      right: -4%;
+      bottom: -31%;
+      width: 48%;
+      aspect-ratio: 1;
+      border: 1px solid #a9d7ad44;
+      border-radius: 50%;
+      content: "";
+      box-shadow: 0 0 0 42px #a9d7ad10, 0 0 0 84px #a9d7ad08;
+      pointer-events: none;
+    }
+    h1, h2, h3, p { margin: 0; }
+    h1 { max-width: 800px; font-size: clamp(2.6rem, 5.4vw, 4.8rem); line-height: 1.02; letter-spacing: -.045em; }
+    h2 { max-width: 930px; font-size: clamp(1.75rem, 3vw, 2.65rem); line-height: 1.12; letter-spacing: -.03em; }
+    h3 { font-size: 1.04rem; line-height: 1.25; }
+    .eyebrow { color: var(--accent); font-size: .76rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+    .cover .eyebrow { color: #b0dfb6; }
+    .lead { max-width: 870px; color: var(--muted); font-size: clamp(1rem, 1.45vw, 1.2rem); }
+    .cover .lead { max-width: 800px; color: #f0f1e8; font-size: clamp(1.2rem, 2vw, 1.7rem); }
+    .subtitle { max-width: 760px; color: #d9e4d9; font-size: 1.02rem; }
+    .byline { margin-top: 8px; color: #c3d0c1; font-size: .92rem; }
+    .topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      width: fit-content;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 700;
+    }
+    .cover .tag { border-color: #ffffff30; background: #ffffff0c; color: #e6eee3; }
+    .grid { display: grid; gap: 14px; }
+    .two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .card {
+      min-width: 0;
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--soft);
+      box-shadow: 0 3px 10px var(--shadow);
+    }
+    .card p, .card li { color: var(--muted); }
+    .card p + p { margin-top: 8px; }
+    .card.accent { border-color: color-mix(in srgb, var(--accent) 36%, var(--line)); background: var(--accent-soft); }
+    .card.gold { border-color: color-mix(in srgb, var(--gold) 32%, var(--line)); background: var(--gold-soft); }
+    .card.green { border-color: color-mix(in srgb, var(--green) 36%, var(--line)); background: var(--green-soft); }
+    .kicker { margin-bottom: 7px; color: var(--muted); font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .metric { display: block; margin: 2px 0 5px; color: var(--accent); font-size: clamp(1.7rem, 3.2vw, 2.75rem); font-weight: 850; letter-spacing: -.045em; line-height: 1; }
+    .metric-label { color: var(--muted); font-size: .88rem; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; align-items: stretch; }
+    .stack { display: grid; gap: 10px; }
+    .list { margin: 0; padding-left: 20px; }
+    .list li { margin: 8px 0; }
+    .list strong { color: var(--ink); }
+    .banner {
+      padding: 12px 16px;
+      border-left: 4px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+      background: var(--accent-soft);
+      color: var(--ink);
+      font-weight: 720;
+    }
+    .banner.gold { border-left-color: var(--gold); background: var(--gold-soft); }
+    .banner.green { border-left-color: var(--green); background: var(--green-soft); }
+    .flow { display: flex; align-items: stretch; gap: 8px; }
+    .step { flex: 1; min-width: 0; padding: 14px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--soft); }
+    .step b { display: block; margin-bottom: 5px; color: var(--accent); font-size: .76rem; letter-spacing: .06em; text-transform: uppercase; }
+    .step span { font-size: .9rem; font-weight: 680; }
+    .arrow { align-self: center; color: var(--accent); font-size: 1.25rem; font-weight: 900; }
+    .example { padding: 15px 18px; border: 1px dashed color-mix(in srgb, var(--accent) 55%, var(--line)); border-radius: 12px; background: var(--accent-soft); }
+    .example code { color: var(--ink); font-size: .9rem; white-space: normal; }
+    .example .answer { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+    .pill { padding: 5px 10px; border-radius: 999px; background: var(--paper); color: var(--ink); font-size: .82rem; font-weight: 700; }
+    table { width: 100%; border-collapse: collapse; font-size: .89rem; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: right; }
+    th { color: var(--muted); font-size: .77rem; letter-spacing: .04em; text-transform: uppercase; }
+    th:first-child, td:first-child { text-align: left; }
+    tbody tr:nth-child(even) { background: var(--soft); }
+    .best { color: var(--green); font-weight: 800; }
+    .chart { display: grid; gap: 11px; }
+    .bar-row { display: grid; grid-template-columns: 68px 1fr 54px; gap: 10px; align-items: center; font-size: .82rem; }
+    .bar-row .name { font-weight: 750; }
+    .track { height: 13px; overflow: hidden; border-radius: 99px; background: var(--line); }
+    .bar { height: 100%; border-radius: inherit; background: var(--accent); }
+    .bar.gemini { background: var(--comparison); }
+    .bar-value { color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+    .axis { display: flex; justify-content: space-between; margin-left: 78px; color: var(--muted); font-size: .72rem; }
+    .table-wrap { overflow-x: auto; }
+    .fine { color: var(--muted); font-size: .78rem; }
+    .source { margin-top: auto; padding-top: 4px; color: var(--muted); font-size: .72rem; }
+    .speaker-note { display: none; }
+    .cover .source { color: #c3d0c1; }
+    .footer {
+      position: absolute;
+      right: clamp(28px, 5vw, 62px);
+      bottom: 18px;
+      left: clamp(28px, 5vw, 62px);
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: .72rem;
+    }
+    .cover .footer { right: clamp(35px, 7vw, 86px); left: clamp(35px, 7vw, 86px); color: #c3d0c1; }
+    .controls { display: flex; justify-content: center; align-items: center; gap: 10px; max-width: 1240px; margin: 10px auto 0; padding: 0 18px; color: var(--muted); }
+    .controls button {
+      padding: 7px 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--paper);
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .controls button:hover { border-color: var(--accent); }
+    .controls .theme-toggle { margin-left: 8px; }
+    #counter { min-width: 58px; text-align: center; font-size: .82rem; font-variant-numeric: tabular-nums; }
+    #progress { width: min(20vw, 160px); height: 5px; border-radius: 99px; background: var(--line); }
+    #progress span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--accent); transition: width .2s; }
+    #notes { display: none; max-width: 1204px; margin: 10px auto; padding: 12px 16px; border: 1px dashed var(--accent); border-radius: 10px; color: var(--ink); }
+    #notes.visible { display: block; }
+    @media (max-width: 760px) {
+      #deck { padding: 8px; }
+      .slide { min-height: 76vh; aspect-ratio: auto; padding: 24px 20px 58px; gap: 12px; }
+      .slide.cover { padding: 36px 24px 60px; }
+      .two, .three, .four, .split { grid-template-columns: 1fr; }
+      .flow { flex-direction: column; }
+      .arrow { transform: rotate(90deg); align-self: center; }
+      .footer { right: 20px; left: 20px; bottom: 14px; }
+      .cover .footer { right: 24px; left: 24px; }
+      .controls { flex-wrap: wrap; }
+    }
+    @media print {
+      body { background: #fff; }
+      #deck { max-width: none; padding: 0; }
+      .slide, .slide.active { display: flex !important; width: 100%; height: 100vh; min-height: 0; aspect-ratio: 16 / 9; border: 0; border-radius: 0; box-shadow: none; page-break-after: always; }
+      .controls, #notes { display: none !important; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <main id="deck" aria-label="JEV-IDS research presentation">
+    <section class="slide cover active" aria-label="Slide 1">
+      <span class="eyebrow">Research in one sentence</span>
+      <h1>JEV-IDS</h1>
+      <p class="lead">Can a lighter “System One” model make network intrusion analysis practical when labels are scarce?</p>
+      <p class="subtitle">A paper-led comparison of typed decisions, a generative LLM, and conventional machine learning on NSL-KDD.</p>
+      <div class="grid three" style="max-width:760px;margin-top:14px">
+        <div class="tag">Less labeled data</div>
+        <div class="tag">Withheld attack types</div>
+        <div class="tag">Cost + latency</div>
+      </div>
+      <p class="byline">Based on Severo et al., “Jev-IDS: A System One Model for Network Intrusion Detection in Label-Scarce and Zero-Day Scenarios” · arXiv:2610.01079v1</p>
+      <div class="footer"><span>JEV-IDS · 15-slide paper explainer</span><span>Use ← → to navigate · N for speaker notes</span></div>
+      <aside class="speaker-note">Open with the central question, not model jargon: can a typed-decision model offer useful detection quality at lower inference cost when labels are scarce? Preview the three dimensions—few labels, withheld attack types, and operational efficiency.</aside>
+    </section>
+
+    <section class="slide" aria-label="Slide 2">
+      <div class="topline"><span class="eyebrow">01 · The basics</span><span class="tag">NIDS + JEV</span></div>
+      <h2>First, what are NIDS and JEV?</h2>
+      <p class="lead">Think of a NIDS as a security checkpoint for network connections—and JEV as one possible decision-maker at that checkpoint.</p>
+      <div class="grid two">
+        <article class="card">
+          <p class="kicker">NIDS · the job</p>
+          <h3>Network Intrusion Detection System</h3>
+          <p>Monitors network traffic—or summaries of connections called flows—and flags activity that may be malicious.</p>
+          <div class="example" style="margin-top:12px">
+            <code>Connection features → normal or suspicious?</code>
+          </div>
+        </article>
+        <article class="card accent">
+          <p class="kicker">JEV · the model</p>
+          <h3>A “System One” decision model</h3>
+          <p>Given a flow and its task instructions, JEV answers typed questions without task-specific fine-tuning.</p>
+          <div class="example" style="margin-top:12px">
+            <code>Attack probability + traffic category</code>
+          </div>
+        </article>
+      </div>
+      <div class="flow" aria-label="How JEV fits into an intrusion detection system">
+        <div class="step"><b>Input</b><span>Network flow</span></div><span class="arrow">→</span>
+        <div class="step"><b>Analyze</b><span>JEV inside JEV-IDS</span></div><span class="arrow">→</span>
+        <div class="step"><b>Output</b><span>Score + category for review</span></div>
+      </div>
+      <div class="banner">Key distinction: NIDS is the security task/system; JEV is the model this paper tests inside that system.</div>
+      <div class="footer"><span>JEV-IDS · Foundations</span><span>Source: paper §2, §4</span></div>
+      <aside class="speaker-note">Start with the checkpoint analogy. NIDS means Network Intrusion Detection System: it examines network connections or their flow summaries for suspicious activity. JEV is not the NIDS itself; it is the System One model used as a decision component in JEV-IDS. Its outputs are a probability and a category. This distinction prepares the audience for why the paper compares models rather than proposing a new network protocol.</aside>
+    </section>
+
+    <section class="slide" aria-label="Slide 3">
+      <div class="topline"><span class="eyebrow">02 · The motivation</span><span class="tag">The trade-off</span></div>
+      <h2>Intrusion detection has two expensive ends of the spectrum</h2>
+      <p class="lead">Traditional detectors are efficient at runtime but depend on representative labeled data. Generative LLMs can classify from instructions and examples, but each request costs time and tokens.</p>
+      <div class="grid two">
+        <article class="card">
+          <p class="kicker">Conventional ML</p>
+          <h3>Fast after training</h3>
+          <ul class="list">
+            <li>Needs task-specific labeled flows</li>
+            <li>New environments or attacks can mean new training data</li>
+            <li>Low inference overhead once deployed</li>
+          </ul>
+        </article>
+        <article class="card gold">
+          <p class="kicker">Generative LLM</p>
+          <h3>Flexible at inference time</h3>
+          <ul class="list">
+            <li>Can use task instructions and examples in the request</li>
+            <li>Longer prompts and generation add latency</li>
+            <li>Hosted inference cost grows with flow volume</li>
+          </ul>
+        </article>
+      </div>
+      <div class="banner">The opportunity: reduce the cost of model-based analysis without giving up too much detection quality.</div>
+      <div class="footer"><span>JEV-IDS · Motivation</span><span>Source: paper §1–2</span></div>
+      <aside class="speaker-note">Set up the research tension, but avoid implying all ML requires huge datasets in every setting. The paper’s narrow question is about a controlled, label-scarce flow-classification setting and the costs of hosted model inference.</aside>
+    </section>
+
+    <section class="slide" aria-label="Slide 4">
+      <div class="topline"><span class="eyebrow">03 · The research gap</span><span class="tag">No fine-tuning</span></div>
+      <h2>Can a System One Model adapt from examples at inference time?</h2>
+      <p class="lead">Instead of updating model weights for a task, provide a few labeled flows in the request and ask for typed decisions.</p>
+      <div class="card accent" style="padding:24px">
+        <p class="kicker">Research question</p>
+        <p style="font-size:clamp(1.2rem,2.35vw,1.9rem);font-weight:790;line-height:1.25">Can JEV detect attacks with few or no labeled examples—and generalize to attack types missing from those examples?</p>
+      </div>
+      <div class="grid three">
+        <div class="card"><p class="kicker">Zero-shot</p><h3>k = 0</h3><p>No labeled examples supplied.</p></div>
+        <div class="card"><p class="kicker">Few-shot</p><h3>k = 1, 2, 4, or 8</h3><p>That many examples per traffic category.</p></div>
+        <div class="card gold"><p class="kicker">“Novel” here</p><h3>Withheld type</h3><p>Attack type is absent from the example pool—not proof of a real-world zero-day.</p></div>
+      </div>
+      <div class="footer"><span>JEV-IDS · Research question</span><span>Source: paper §2, §5</span></div>
+      <aside class="speaker-note">Define k carefully: the number of labeled examples from each of the five coarse categories, not the total number of examples. Preview the paper’s simulated novelty condition without calling it a validated zero-day test.</aside>
+    </section>
+
+    <section class="slide" aria-label="Slide 5">
+      <div class="topline"><span class="eyebrow">04 · The proposed approach</span><span class="tag">JEV-IDS</span></div>
+      <h2>A System One model answers decisions, not essays</h2>
+      <p class="lead">JEV-IDS wraps JEV in a flow-classification pipeline. The app supplies the flow, task instructions, category definitions, and optional labeled examples.</p>
+      <div class="flow" aria-label="JEV-IDS processing pipeline">
+        <div class="step"><b>1 · Represent</b><span>Serialize flow features in a fixed order</span></div><span class="arrow">→</span>
+        <div class="step"><b>2 · Context</b><span>Add instructions and optional examples</span></div><span class="arrow">→</span>
+        <div class="step"><b>3 · Ask</b><span>Submit two typed questions to JEV</span></div><span class="arrow">→</span>
+        <div class="step"><b>4 · Decide</b><span>Read structured fields; threshold locally</span></div>
+      </div>
+      <div class="grid two">
+        <div class="card"><h3>What JEV returns</h3><p>Attack probability, predicted category, and category confidence.</p></div>
+        <div class="card green"><h3>What the application controls</h3><p>The binary verdict uses a local 0.5 threshold; the model does not return a free-form alert essay.</p></div>
+      </div>
+      <div class="footer"><span>JEV-IDS · Method</span><span>Source: paper §4</span></div>
+      <aside class="speaker-note">Emphasize the separation between model output and application logic. The model supplies typed values; JEV-IDS applies the binary threshold locally. The study did not evaluate probability calibration or deployment-specific thresholds.</aside>
+    </section>
+
+    <section class="slide" aria-label="Slide 6">
+      <div class="topline"><span class="eyebrow">05 · The model interface</span><span class="tag">Two questions per flow</span></div>
+      <h2>Two small, typed outputs become one useful assessment</h2>
+      <p class="lead">The same flow is evaluated for binary intrusion probability and a finite traffic category.</p>
+      <div class="grid two">
+        <article class="card accent">
+          <p class="kicker">Question 1 · Probabilistic</p>
+          <h3>“Is this flow an attack?”</h3>
+          <p>Returns an attack probability between 0 and 1.</p>
+          <div class="example" style="margin-top:12px"><code>p(attack) = 0.82</code><div class="answer"><span class="pill">Local threshold: 0.5</span><span class="pill">Verdict: attack</span></div></div>
+        </article>
+        <article class="card">
+          <p class="kicker">Question 2 · Finite choice</p>
+          <h3>“Which traffic category fits?”</h3>
+          <p>Returns one category and its choice confidence.</p>
+          <div class="example" style="margin-top:12px"><code>Category = DoS · confidence = 0.91</code><div class="answer"><span class="pill">Normal</span><span class="pill">DoS</span><span class="pill">Probe</span><span class="pill">R2L</span><span class="pill">U2R</span></div></div>
+        </article>
+      </div>
+      <div class="banner">Typed answers are easier for software to validate and log than unconstrained generated prose.</div>
+      <div class="footer"><span>JEV-IDS · Method</span><span>Source: paper §4.2–4.4</span></div>
+      <aside class="speaker-note">The example values on this slide are illustrative, not a paper result. The two questions share the supplied flow state. Category confidence is not the same thing as a calibrated attack probability.</aside>
+    </section>
+
+    <section class="slide" aria-label="Slide 7">
+      <div class="topline"><span class="eyebrow">06 · Experimental design</span><span class="tag">Controlled comparison</span></div>
+      <h2>The experiment varies examples while holding the test flows fixed</h2>
+      <p class="lead">This isolates what happens when detectors receive different amounts of labeled context.</p>
+      <div class="split">
+        <div class="stack">
+          <div class="card"><p class="kicker">Example pool</p><h3>KDDTrain+</h3><p>Only labeled examples are drawn from this split.</p></div>
+          <div class="card accent"><p class="kicker">Evaluation</p><h3>KDDTest+</h3><p>A fixed set of 2,000 flows; none is used as a prompt example or to fit the baselines.</p></div>
+        </div>
+        <div class="stack">
+          <div class="card"><p class="kicker">Label budget</p><h3>k ∈ {0, 1, 2, 4, 8}</h3><p>k examples per each of five coarse categories; three independent example draws for k &gt; 0.</p></div>
+          <div class="card"><p class="kicker">Decision rule</p><h3>Common 0.5 threshold</h3><p>Enables a controlled comparison, but is not a tuned production threshold.</p></div>
+        </div>
+      </div>
+      <div class="banner">No task-specific fine-tuning of JEV or Gemini; the example budget changes the in-context information.</div>
+      <div class="footer"><span>JEV-IDS · Experimental design</span><span>Source: paper §5.1, §5.3</span></div>
+      <aside class="speaker-note">Stress the separation between KDDTrain+ and KDDTest+. This avoids test-flow leakage into the prompt examples or supervised baseline training. The same test set is reused, so few-shot runs are paired rather than independent datasets.</aside>
+    </section>
+
+    <section class="slide" aria-label="Slide 8">
+      <div class="topline"><span class="eyebrow">07 · The benchmark</span><span class="tag">NSL-KDD</span></div>
+      <h2>2,000 test flows make the experiment easy to inspect</h2>
+      <p class="lead">The fixed KDDTest+ evaluation set is intentionally balanced across normal and attack traffic relative to the source dataset.</p>
+      <div class="grid four">
+        <div class="card"><p class="kicker">Total flows</p><span class="metric">2,000</span><p class="metric-label">evaluation records</p></div>
+        <div class="card"><p class="kicker">Normal</p><span class="metric">874</span><p class="metric-label">benign flows</p></div>
+        <div class="card"><p class="kicker">Attacks</p><span class="metric">1,126</span><p class="metric-label">malicious flows</p></div>
+        <div class="card gold"><p class="kicker">Novel types</p><span class="metric">300</span><p class="metric-label">attack flows from types absent in KDDTrain+</p></div>
+      </div>
+      <div class="table-wrap">
+        <table aria-label="NSL-KDD evaluation set composition">
+          <thead><tr><th>Traffic</th><th>Normal</th><th>DoS</th><th>Probe</th><th>R2L</th><th>U2R</th><th>Total</th></tr></thead>
+          <tbody><tr><td>Flows</td><td>874</td><td>642</td><td>213</td><td>248</td><td>23</td><td>2,000</td></tr></tbody>
+        </table>
+      </div>
+      <div class="banner gold">Scope check: NSL-KDD is a historical benchmark—not representative contemporary production traffic.</div>
+      <div class="footer"><span>JEV-IDS · Dataset</span><span>Source: paper §5.3, Table 1</span></div>
+      <aside class="speaker-note">The 300 novel flows are a subset of the 1,126 attacks. “Novel” is assigned by comparing concrete attack types across the standard train and test splits; it does not mean the dataset contains newly discovered exploits.</aside>
+    </section>
+
+    <section class="slide" aria-label="Slide 9">
+      <div class="topline"><span class="eyebrow">08 · Baselines</span><span class="tag">Like-for-like inputs</span></div>
+      <h2>Three approaches expose different strengths and failure modes</h2>
+      <p class="lead">The core comparison keeps flow attributes, available labeled examples, and the binary decision threshold aligned.</p>
+      <div class="grid three">
+        <article class="card accent"><p class="kicker">Proposed</p><h3>JEV</h3><p>System One Model; typed probability and category decisions, with no task-specific fine-tuning.</p></article>
+        <article class="card"><p class="kicker">Generative baseline</p><h3>Gemini 3.6 Flash</h3><p>Structured-output LLM; prompted with the same flow information and example budget.</p></article>
+        <article class="card gold"><p class="kicker">Supervised baseline</p><h3>Random Forest</h3><p>100 trees; trained on the same few labeled flows, plus a separate full-pool reference.</p></article>
+      </div>
+      <div class="grid two">
+        <div class="card"><p class="kicker">Primary score</p><h3>Attack-class F1</h3><p>Balances attack precision and recall at the common threshold.</p></div>
+        <div class="card"><p class="kicker">Additional evidence</p><h3>Novel recall · latency · estimated cost</h3><p>Measures withheld-type behavior and practical inference trade-offs.</p></div>
+      </div>
+      <p class="fine">The paper also reports an Isolation Forest and threshold-independent metrics as supplementary baselines/results.</p>
+      <div class="footer"><span>JEV-IDS · Evaluation</span><span>Source: paper §5.2, §5.4</span></div>
+      <aside class="speaker-note">Keep the main comparison on JEV, Gemini, and the low-data Random Forest, as in the presentation brief. The paper includes extra references; avoid suggesting its full-pool Random Forest is the same-budget baseline.</aside>
+    </section>
+
+    <section class="slide" aria-label="Slide 10">
+      <div class="topline"><span class="eyebrow">09 · Headline result</span><span class="tag">k = 1 example per category</span></div>
+      <h2>JEV is close on F1—and markedly lighter to run</h2>
+      <p class="lead">At one example per category, Gemini has the higher F1. JEV’s advantage is the measured latency and estimated cost trade-off.</p>
+      <div class="grid three">
+        <div class="card">
+          <p class="kicker">Attack F1</p>
+          <span class="metric">0.856</span>
+          <p class="metric-label">JEV · Gemini: 0.880</p>
+          <p class="fine" style="margin-top:8px">Difference: 0.024 F1 points</p>
+        </div>
+        <div class="card accent">
+          <p class="kicker">Mean successful-request latency</p>
+          <span class="metric">315 ms</span>
+          <p class="metric-label">JEV · Gemini: 2,420 ms</p>
+          <p class="fine" style="margin-top:8px">≈7.7× lower latency</p>
+        </div>
+        <div class="card green">
+          <p class="kicker">Estimated cost / 1M decisions</p>
+          <span class="metric">$74</span>
+          <p class="metric-label">JEV · Gemini: $1,651</p>
+          <p class="fine" style="margin-top:8px">≈22× lower estimated cost</p>
+        </div>
+      </div>
+      <div class="banner">The paper’s tables support “faster and cheaper, with near-but-not-best F1”—not an accuracy win.</div>
+      <div class="footer"><span>JEV-IDS · Results</span><span>Source: paper Tables 2 and 4 · k = 1</span></div>
+      <aside class="speaker-note">State all three values together and say the cost is an estimate from provider list prices per million flow decisions. Critical source note: the paper’s abstract/narrative claims about 4.8× speed and 3.8× cost do not match Table 4; at k=1, Table 4’s Gemini comparison gives about 7.7× lower latency and 22× lower cost. Use the explicit table values and disclose the manuscript inconsistency if asked.</aside>
+    </section>
+
+    <section class="slide" aria-label="Slide 11">
+      <div class="topline"><span class="eyebrow">10 · Accuracy, unpacked</span><span class="tag">k = 1</span></div>
+      <h2>Similar precision; Gemini catches more attacks overall</h2>
+      <p class="lead">The F1 gap is mainly a recall gap. JEV’s precision is slightly higher in this condition, but fewer attacks are detected.</p>
+      <div class="table-wrap">
+        <table aria-label="Detection results at k equals 1">
+          <thead><tr><th>Detector</th><th>F1</th><th>Precision</th><th>Attack recall</th><th>Known-attack recall</th><th>Novel-attack recall</th></tr></thead>
+          <tbody>
+            <tr><td>JEV</td><td>0.856 ± 0.025</td><td class="best">0.953</td><td>0.778</td><td>0.790</td><td class="best">0.747</td></tr>
+            <tr><td>Gemini 3.6 Flash</td><td class="best">0.880 ± 0.020</td><td>0.942</td><td class="best">0.826</td><td class="best">0.866</td><td>0.713</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="grid two">
+        <div class="card green"><h3>JEV’s edge here</h3><p>Higher precision and higher novel-attack recall at k = 1.</p></div>
+        <div class="card gold"><h3>Gemini’s edge here</h3><p>Higher overall F1 and attack recall, including known attacks.</p></div>
+      </div>
+      <p class="fine">Values are reported results for the fixed evaluation set; F1 includes variation across three example draws.</p>
+      <div class="footer"><span>JEV-IDS · Results</span><span>Source: paper Table 2 · k = 1</span></div>
+      <aside class="speaker-note">Define precision as “when it flags, how often is it an attack?” and recall as “of all attacks, how many are caught?” This lets the audience understand why higher precision does not make JEV the higher-F1 detector.</aside>
+    </section>
+
+    <section class="slide" aria-label="Slide 12">
+      <div class="topline"><span class="eyebrow">11 · Generalization</span><span class="tag">Novel-attack recall</span></div>
+      <h2>With examples, JEV recalls more withheld attack types</h2>
+      <p class="lead">The advantage is conditional: Gemini is stronger at k = 0, then JEV’s measured novel recall is higher once examples are supplied.</p>
+      <div class="split">
+        <div class="card">
+          <div class="chart" aria-label="Novel attack recall by number of examples">
+            <div class="bar-row"><span class="name">k = 0</span><div class="track"><div class="bar" style="width:62.2%"></div></div><span class="bar-value">.622</span></div>
+            <div class="bar-row"><span class="name">k = 1</span><div class="track"><div class="bar" style="width:74.7%"></div></div><span class="bar-value">.747</span></div>
+            <div class="bar-row"><span class="name">k = 2</span><div class="track"><div class="bar" style="width:73.8%"></div></div><span class="bar-value">.738</span></div>
+            <div class="bar-row"><span class="name">k = 4</span><div class="track"><div class="bar" style="width:73.1%"></div></div><span class="bar-value">.731</span></div>
+            <div class="bar-row"><span class="name">k = 8</span><div class="track"><div class="bar" style="width:72.1%"></div></div><span class="bar-value">.721</span></div>
+            <div class="axis"><span>0</span><span>JEV · bar values</span><span>1.0</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Gemini comparison</h3>
+          <div class="chart" style="margin-top:13px">
+            <div class="bar-row"><span class="name">k = 0</span><div class="track"><div class="bar gemini" style="width:68.7%"></div></div><span class="bar-value">.687</span></div>
+            <div class="bar-row"><span class="name">k = 1</span><div class="track"><div class="bar gemini" style="width:71.3%"></div></div><span class="bar-value">.713</span></div>
+            <div class="bar-row"><span class="name">k = 2</span><div class="track"><div class="bar gemini" style="width:68.4%"></div></div><span class="bar-value">.684</span></div>
+            <div class="bar-row"><span class="name">k = 4</span><div class="track"><div class="bar gemini" style="width:71.7%"></div></div><span class="bar-value">.717</span></div>
+            <div class="bar-row"><span class="name">k = 8</span><div class="track"><div class="bar gemini" style="width:70.2%"></div></div><span class="bar-value">.702</span></div>
+            <div class="axis"><span>0</span><span>Gemini · bar values</span><span>1.0</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="banner gold">Statistical support is strongest at k = 1 (p = .007) and k = 2 (p &lt; .001); differences at k = 4 and 8 were not significant.</div>
+      <div class="footer"><span>JEV-IDS · Results</span><span>Source: paper Table 2, §6.2–6.3</span></div>
+      <aside class="speaker-note">Read this as benchmark generalization, not zero-day detection in the wild. The paired tests found stronger evidence at k=1 and k=2. At k=0 Gemini leads; at k=4 and k=8 JEV’s numeric lead is not statistically significant.</aside>
+    </section>
+
+    <section class="slide" aria-label="Slide 13">
+      <div class="topline"><span class="eyebrow">12 · The ML baseline</span><span class="tag">k = 1</span></div>
+      <h2>The low-data Random Forest catches attacks—but floods the alert queue</h2>
+      <p class="lead">At the smallest labeled budget, the Random Forest labels every attack as malicious, but does so by flagging many normal flows too.</p>
+      <div class="grid two">
+        <div class="card gold">
+          <p class="kicker">Random Forest · 874 normal flows</p>
+          <span class="metric">≈764</span>
+          <p class="metric-label">false alarms · precision 0.598</p>
+          <p style="margin-top:8px;color:var(--muted)">Attack recall: 1.000 in this k = 1 condition.</p>
+        </div>
+        <div class="card green">
+          <p class="kicker">JEV · same evaluation set</p>
+          <span class="metric">≈43</span>
+          <p class="metric-label">false alarms · precision 0.953</p>
+          <p style="margin-top:8px;color:var(--muted)">About 18× fewer false alarms than the low-data RF in this condition.</p>
+        </div>
+      </div>
+      <div class="banner">Operational lesson: a high attack recall is not enough if analysts must triage hundreds of extra alerts.</div>
+      <p class="fine">At k = 8, the Random Forest’s F1 reaches 0.865; its behavior improves as the labeled budget increases.</p>
+      <div class="footer"><span>JEV-IDS · Results</span><span>Source: paper §6.1, §6.3</span></div>
+      <aside class="speaker-note">The false-alarm comparison uses the paper’s approximate counts for the same 874 normal evaluation flows. Do not overgeneralize it to fully trained Random Forests: the paper reports different behavior for the full-pool reference and improved F1 at k=8.</aside>
+    </section>
+
+    <section class="slide" aria-label="Slide 14">
+      <div class="topline"><span class="eyebrow">13 · Interpretation and caveats</span><span class="tag">What the study supports</span></div>
+      <h2>Promising for enrichment—not evidence for line-rate detection</h2>
+      <div class="grid two">
+        <div class="card accent">
+          <p class="kicker">Reasonable placement</p>
+          <h3>Secondary analysis of selected flows</h3>
+          <ul class="list">
+            <li>Enrich alerts with a structured score and category</li>
+            <li>Use for analyst triage or selective escalation</li>
+            <li>Consider a hybrid cascade as future work—not a tested result</li>
+          </ul>
+        </div>
+        <div class="card gold">
+          <p class="kicker">Limits to keep visible</p>
+          <ul class="list">
+            <li>NSL-KDD is historical; contemporary datasets are needed</li>
+            <li>Novelty means withheld attack type in this benchmark</li>
+            <li>Three example draws; threshold was common, not tuned</li>
+            <li>Both hosted models are much slower than local ML</li>
+          </ul>
+        </div>
+      </div>
+      <div class="banner gold"><strong>Source discrepancy:</strong> the paper’s abstract/narrative and result tables do not agree on the LLM identity and efficiency ratios. Slides 9–11 use the explicit Gemini 3.6 Flash results in Tables 2 and 4.</div>
+      <div class="footer"><span>JEV-IDS · Discussion</span><span>Source: paper §6–7</span></div>
+      <aside class="speaker-note">Be candid that the hybrid cascade is a proposed use, not something the paper evaluates. Important: the paper body’s introductory claim names GPT-5.6 Luna and its abstract/narrative efficiency ratios differ from the Gemini 3.6 Flash results tables. Our quantitative slides prioritize the tables, which identify the comparator and give reproducible metric values.</aside>
+    </section>
+
+    <section class="slide" aria-label="Slide 15">
+      <div class="topline"><span class="eyebrow">14 · The take-home</span><span class="tag">Five lines to remember</span></div>
+      <h2>JEV-IDS is a trade-off story—not an accuracy victory</h2>
+      <div class="stack" style="gap:9px">
+        <div class="banner"><strong>Problem:</strong> conventional ML needs task-specific labels; hosted LLM inference is slow and costly.</div>
+        <div class="banner"><strong>Gap:</strong> can a System One model work with scarce labels and withheld attack types, without fine-tuning?</div>
+        <div class="banner"><strong>Method:</strong> two typed decisions per flow, evaluated on NSL-KDD against Gemini 3.6 Flash and Random Forest.</div>
+        <div class="banner"><strong>Result:</strong> at k = 1, near-but-lower F1 (0.856 vs 0.880), ≈7.7× lower latency, and ≈22× lower estimated cost; higher novel recall with examples.</div>
+        <div class="banner green"><strong>Takeaway:</strong> a candidate for alert enrichment or selective secondary analysis—not mainline, line-rate detection.</div>
+      </div>
+      <p class="fine">Q&amp;A · Paper: Severo et al., “Jev-IDS: A System One Model for Network Intrusion Detection in Label-Scarce and Zero-Day Scenarios,” arXiv:2610.01079v1.</p>
+      <div class="footer"><span>JEV-IDS · Q&amp;A</span><span>Thanks</span></div>
+      <aside class="speaker-note">Close with the five lines. If someone repeats that JEV wins on the accuracy–speed–cost trade-off, while Gemini still wins on raw overall accuracy, the main point has landed. Correct any claim that implies the benchmark proves real zero-day readiness.</aside>
+    </section>
+  </main>
+
+  <div class="controls" aria-label="Presentation controls">
+    <button id="prev" type="button" aria-label="Previous slide">← Prev</button>
+    <span id="counter" aria-live="polite">1 / 15</span>
+    <div id="progress" role="progressbar" aria-label="Slide progress" aria-valuemin="1" aria-valuemax="15" aria-valuenow="1"><span></span></div>
+    <button id="next" type="button" aria-label="Next slide">Next →</button>
+    <button id="note-toggle" type="button" aria-expanded="false">Speaker notes (N)</button>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false">Dark theme</button>
+  </div>
+  <div id="notes" role="status" aria-live="polite"></div>
+
+  <script>
+    const slides = [...document.querySelectorAll(".slide")];
+    const counter = document.getElementById("counter");
+    const progress = document.querySelector("#progress span");
+    const progressTrack = document.getElementById("progress");
+    const notes = document.getElementById("notes");
+    const noteToggle = document.getElementById("note-toggle");
+    const themeToggle = document.getElementById("theme-toggle");
+    let current = 0;
+
+    function setTheme(theme) {
+      const isDark = theme === "dark";
+      document.documentElement.dataset.theme = isDark ? "dark" : "light";
+      themeToggle.textContent = isDark ? "Light theme" : "Dark theme";
+      themeToggle.setAttribute("aria-pressed", String(isDark));
+    }
+
+    function showSlide(index) {
+      current = Math.max(0, Math.min(slides.length - 1, index));
+      slides.forEach((slide, position) => {
+        const active = position === current;
+        slide.classList.toggle("active", active);
+        slide.setAttribute("aria-hidden", String(!active));
+      });
+      counter.textContent = `${current + 1} / ${slides.length}`;
+      progress.style.width = `${((current + 1) / slides.length) * 100}%`;
+      progressTrack.setAttribute("aria-valuenow", String(current + 1));
+      notes.textContent = slides[current].querySelector(".speaker-note").textContent;
+      if (notes.classList.contains("visible")) notes.setAttribute("aria-label", `Speaker notes for slide ${current + 1}`);
+      window.scrollTo(0, 0);
+      window.location.hash = `slide-${current + 1}`;
+    }
+
+    document.getElementById("prev").addEventListener("click", () => showSlide(current - 1));
+    document.getElementById("next").addEventListener("click", () => showSlide(current + 1));
+    noteToggle.addEventListener("click", () => {
+      const visible = notes.classList.toggle("visible");
+      noteToggle.setAttribute("aria-expanded", String(visible));
+    });
+    themeToggle.addEventListener("click", () => {
+      setTheme(document.documentElement.dataset.theme === "dark" ? "light" : "dark");
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "ArrowRight" || event.key === "PageDown") showSlide(current + 1);
+      if (event.key === "ArrowLeft" || event.key === "PageUp") showSlide(current - 1);
+      if (event.key.toLowerCase() === "n") noteToggle.click();
+    });
+
+    const initialSlide = Number(window.location.hash.match(/^#slide-(\d+)$/)?.[1]);
+    if (Number.isInteger(initialSlide) && initialSlide > 0) showSlide(initialSlide - 1);
+    else showSlide(0);
+    setTheme("light");
+  </script>
+</body>
+</html>
